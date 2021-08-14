@@ -1,25 +1,61 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Component, useState } from 'react';
+import GoogleMapReact from 'google-map-react';
+import { Lote, Empreendimento } from './style';
+import LoteDetalhe from './components/LoteDetalhe';
 
-function App() {
+
+const AnyReactComponent = ({ text }) => {
+  const [isShowDetails, showDetails] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+    <Lote onClick={() => showDetails(true)}>
+      {isShowDetails && <LoteDetalhe>
+        <button onMouseOver={showDetails}>Click</button>
+      </LoteDetalhe>}
+      <h4>{text}</h4>
+    </Lote>
+  )
 }
 
-export default App;
+class SimpleMap extends Component {
+  static defaultProps = {
+    center: {
+      lat: -12.552039,
+      lng: -55.7134962
+    },
+    zoom: 17
+  };
+
+  render() {
+    return (
+      // Important! Always set the container height explicitly
+      <div style={{ height: '100vh', width: '100%' }}>
+        <GoogleMapReact
+          bootstrapURLKeys={{ key: "AIzaSyDMUd2TyUzjQDhNksbiKQ0zT95gEjbGBPw" }}
+          defaultCenter={this.props.center}
+          defaultZoom={this.props.zoom}
+        >
+          <Empreendimento
+            lat={-12.552039}
+            lng={-55.7134962}
+          >
+            <AnyReactComponent
+              lat={-12.552039}
+              lng={-55.7134962}
+              text="My Marker"
+            />
+            <AnyReactComponent
+              lat={-12.552042}
+              lng={-55.713469}
+              text="My Marker"
+            />
+          </Empreendimento>
+          
+        </GoogleMapReact>
+      </div>
+    );
+  }
+}
+
+export default SimpleMap;
