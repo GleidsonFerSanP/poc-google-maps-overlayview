@@ -1,65 +1,130 @@
+import React, { createRef } from 'react';
+import { Loader } from '@googlemaps/js-api-loader';
+import MarkerClusterer from '@google/markerclusterer'
+const GOOGLE_MAP_API_KEY = 'AIzaSyDMUd2TyUzjQDhNksbiKQ0zT95gEjbGBPw';
+
+const loader = new Loader({
+  apiKey: GOOGLE_MAP_API_KEY,
+  version: "weekly",
+  libraries: ["places"]
+});
+
+const mapOptions = {
+  // center: {
+  //   lat: -12.5474482,
+  //   lng: -55.744436
+  // },
+  center: { lat: -12.555650, lng: -55.799598 },
+  //center: { lat: 40.74, lng: -74.18 },
+  mapTypeId: "satellite",
+  zoom: 20
+};
+
+loader
+  .load()
+  .then((google) => {
+    const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+     const bounds = new google.maps.LatLngBounds(
+    new google.maps.LatLng(-12.561192,-55.781715),
+    new google.maps.LatLng(-12.565302,-55.778695)
+  );
+      const labels = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+     /*   const marker = new google.maps.Marker({
+          position: new google.maps.LatLng(-12.555695,-55.799630),
+          map,
+          title: "Hello World!",
+          icon: "http://localhost:3000/marker.png"
+        });
+          */
+  // Add a marker clusterer to manage the markers.
+     
 
 
-import React from 'react';
-import { withScriptjs, withGoogleMap, GoogleMap, Marker, OverlayView } from "react-google-maps";
 
-const getPixelPositionOffset = (width, height) => ({
-  x: -(width / 2),
-  y: -(height / 2),
-})
 
-const MyMapComponent = withScriptjs(withGoogleMap((props) =>
-  <GoogleMap
-    defaultZoom={15}
-    defaultCenter={{ lat: -34.397, lng: 150.644 }}
-  >
-     <OverlayView
-      position={{ lat: -34.397, lng: 150.644 }}
-      /*
-       * An alternative to specifying position is specifying bounds.
-       * bounds can either be an instance of google.maps.LatLngBounds
-       * or an object in the following format:
-       */
-       bounds={{
-          ne: { lat: -34.400471, lng: 150.005608 },
-          sw: { lat: -34.281819, lng: 150.287132 }
-       }}
-       
-      /*
-       * 1. Specify the pane the OverlayView will be rendered to. For
-       *    mouse interactivity, use `OverlayView.OVERLAY_MOUSE_TARGET`.
-       *    Defaults to `OverlayView.OVERLAY_LAYER`.
-       */
-      mapPaneName={OverlayView.OVERLAY_LAYER}
-      /*
-       * 2. Tweak the OverlayView's pixel position. In this case, we're
-       *    centering the content.
-       */
-      getPixelPositionOffset={getPixelPositionOffset}
-      /*
-       * 3. Create OverlayView content using standard React components.
-       */
-    >
-      <div style={{ background: `red`, border: `1px solid #000`, padding: 15, width: '300px' }}>
-        <h1>OverlayView</h1>
-        <button onClick={props.onClick} style={{ height: 60 }}>
-          I have been clicked {props.count} time{props.count > 1 ? `s` : ``}
-        </button>
-      </div>
-    </OverlayView>
-  </GoogleMap>
-))
 
-const Maps = () => {
-    return(
-        <MyMapComponent
-            isMarkerShown
-            googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyDMUd2TyUzjQDhNksbiKQ0zT95gEjbGBPw&v=3.exp&libraries=&v=weekly"
-            loadingElement={<div style={{ height: `100%` }} />}
-            containerElement={<div style={{ height: `600px` }} />}
-            mapElement={<div style={{ height: `100%` }} />}
-        />
-    )
+
+          const contentString =
+    '<div id="content">' +
+    '<div id="siteNotice">' +
+    "</div>" +
+    '<h1 id="firstHeading" class="firstHeading">Uluru</h1>' +
+    '<div id="bodyContent">' +
+    "<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large " +
+    "sandstone rock formation in the southern part of the " +
+    "Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) " +
+    "south west of the nearest large town, Alice Springs; 450&#160;km " +
+    "(280&#160;mi) by road. Kata Tjuta and Uluru are the two major " +
+    "features of the Uluru - Kata Tjuta National Park. Uluru is " +
+    "sacred to the Pitjantjatjara and Yankunytjatjara, the " +
+    "Aboriginal people of the area. It has many springs, waterholes, " +
+    "rock caves and ancient paintings. Uluru is listed as a World " +
+    "Heritage Site.</p>" +
+    '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">' +
+    "https://en.wikipedia.org/w/index.php?title=Uluru</a> " +
+    "(last visited June 22, 2009).</p>" +
+    "</div>" +
+    "</div>";
+  const infowindow = new google.maps.InfoWindow({
+    content: contentString,
+  });
+
+  const locations = [
+  { lat: -12.555580, lng: -55.799630 },
+  { lat: -12.555695, lng: -55.799630 },
+]
+
+   const markers = locations.map((location, i) => {
+            const marker = new google.maps.Marker({
+              position: location,
+              label: labels[i % labels.length],
+              icon: "http://localhost:3000/marker.png"
+            });
+             marker.addListener("click", () => {
+                infowindow.open({
+                  anchor: marker,
+                  map,
+                  shouldFocus: false,
+                });
+              });
+              return marker;
+          });
+  const imageBounds = {
+    north: -12.554639,
+    south: -12.562639,
+    east: -55.790000,
+    west: -55.800000,
+  };
+  const historicalOverlay = new google.maps.GroundOverlay(
+    "http://localhost:3000/outro_teste.png",
+    imageBounds
+  );
+
+  console.log('GGGG', google.maps);
+  
+
+  new MarkerClusterer  (map, markers, {
+     imagePath:
+       "http://localhost:3000/marker.png",
+   });
+    historicalOverlay.setMap(map);
+
+  })
+  .catch(e => {
+    console.error('error on loading maps', e);
+  });
+
+const GoogleMap = () => {
+  const googleMapRef = createRef()
+
+
+   return (
+       <div
+       id="map"
+       ref={googleMapRef}
+       style={{ width: '100%', height: '800px' }}
+       />
+   )
 }
 
-export default Maps;
+export default GoogleMap;
